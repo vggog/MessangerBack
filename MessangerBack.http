@@ -1,0 +1,6 @@
+@MessangerBack_HostAddress = http://localhost:80
+
+GET {{MessangerBack_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
