@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using MessangerBack.DataBase;
 using MessangerBack.Models;
 
@@ -17,5 +18,10 @@ public class AuthRepository : IAuthRepository
     {
         await _context.Users.AddAsync(user);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<UserModel?> GetUserByUsername(string username)
+    {
+        return await _context.Users.FirstOrDefaultAsync(u => u.UserName == username);
     }
 }

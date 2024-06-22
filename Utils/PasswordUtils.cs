@@ -7,4 +7,9 @@ public class PasswordUtils : IPasswordUtils
     {
         return BCrypt.Net.BCrypt.EnhancedHashPassword(password);
     }
+
+    public bool CheckPassword(string password, string passwordHash)
+    {
+        return BCrypt.Net.BCrypt.EnhancedVerify(password, passwordHash);
+    }
 }
