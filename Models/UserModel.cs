@@ -9,4 +9,6 @@ public class UserModel
     public string PasswordHash { get; set; }
 
     public string Email { get; set; }
+
+    public List<ChatModel> ChatWhereIsTheAdmin { get; set; } = new List<ChatModel>();
 }
