@@ -9,7 +9,7 @@ public class ChatModel
 
     public Guid AdminId { get; set; }
 
-    public UserModel Admin{ get; set; }
+    public virtual UserModel Admin{ get; set; }
 
     public Guid[] Users { get; set; }
     
@@ -17,7 +17,7 @@ public class ChatModel
 
     public Guid? LastMessageId { get; set; }
 
-    public MessageModel? LastMessage { get; set; }
+    public virtual MessageModel? LastMessage { get; set; }
 
-    public List<MessageModel> Messages { get; set; } = new List<MessageModel>();
+    public virtual List<MessageModel> Messages { get; set; } = new List<MessageModel>();
 }
