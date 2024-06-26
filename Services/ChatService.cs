@@ -1,6 +1,7 @@
 using MessangerBack.Models;
 using MessangerBack.Repositories;
 using MessangerBack.Exceptions;
+using MessangerBack.Responces;
 
 
 namespace MessangerBack.Services;
@@ -55,5 +56,37 @@ public class ChatService : IChatService
 
         chat.Users = chatMembers;
         await _repository.UpdateChat(chat);
+    }
+
+    public async Task<List<AllChatsResponce>> GetAllUserChats(Guid userId)
+    {
+        List<AllChatsResponce> responce = new();
+        
+        List<ChatModel> chats = await _repository.GetAllUserChats(userId);
+        foreach(var chat in chats)
+        {
+            responce.Add(
+                new()
+                {
+                    Id = chat.Id,
+                    ChatName = chat.ChatName,
+                    LastMessageId = chat.LastMessageId,
+                    LastMessage = new()
+                    {
+                        Id = chat.LastMessage.Id,
+                        SenderId = chat.LastMessage.SenderId,
+                        Sender = new ()
+                        {
+                            Id = chat.LastMessage.Sender.Id,
+                            UserName = chat.LastMessage.Sender.UserName,
+                        },
+                        Text = chat.LastMessage.Text,
+                        MessageSentTime = chat.LastMessage.MessageSentTime
+                    }
+                }
+            );
+        }
+
+        return responce;
     }
 }

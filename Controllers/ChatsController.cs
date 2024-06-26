@@ -59,4 +59,15 @@ public class ChatsController : ControllerBase
 
         return Ok();
     }
+
+    [HttpGet]
+    async public Task<IActionResult> GetAllChats()
+    {
+        var rawUserId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = Guid.Parse(rawUserId);
+
+        var chats = await _service.GetAllUserChats(userId);
+
+        return Ok(chats);
+    }
 }
