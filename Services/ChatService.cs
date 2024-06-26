@@ -32,17 +32,12 @@ public class ChatService : IChatService
         await _messageService.CreateMessage(adminId, chat.Id, "Создал чат");
     }
 
-    public async Task AddToChat(Guid userId, string rawChatId)
+    public async Task AddToChat(Guid userId, Guid chatId)
     {
         ChatModel chat;
         try
         {
-            Guid chatId = Guid.Parse(rawChatId);
             chat = await _repository.GetChatById(chatId);
-        }
-        catch (FormatException)
-        {
-            throw new WrongUserInputException("Id чата введён не верно.");
         }
         catch (InvalidOperationException)
         {

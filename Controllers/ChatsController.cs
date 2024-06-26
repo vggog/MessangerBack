@@ -10,7 +10,6 @@ using MessangerBack.Schemas;
 using MessangerBack.Services;
 using MessangerBack.Exceptions;
 using MessangerBack.Responces;
-using MessangerBack.Exceptions;
 
 
 namespace MessangerBack.Controllers;
@@ -38,16 +37,16 @@ public class ChatsController : ControllerBase
         return Created();
     }
 
-    [HttpPost]
+    [HttpGet]
     [Route("Add")]
-    async public Task<IActionResult> AddToChat([FromBody] AddToChatRequestSchema chatData)
+    async public Task<IActionResult> AddToChat(Guid chatId)
     {
         var userId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
         var token = Guid.Parse(userId);
 
         try
         {
-            await _service.AddToChat(token, chatData.ChatId);
+            await _service.AddToChat(token, chatId);
         } 
         catch(WrongUserInputException ex)
         {
