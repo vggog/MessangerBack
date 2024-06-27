@@ -13,6 +13,8 @@ public class ChatModel
 
     public Guid[] Users { get; set; }
     
+    public virtual List<UserModel> ModelsOfUsers { get; set; }
+    
     public string ChatName { get; set; }
 
     public Guid? LastMessageId { get; set; }
