@@ -12,7 +12,13 @@ public static class RedisProvider
     }
     static RedisProvider()
     {
-        var connection = ConnectionMultiplexer.Connect("localhost:6379");
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json")
+            .Build();
+
+        var redisHost = configuration.GetSection("ConnectionStrings:RedisConnection").Value;
+        var connection = ConnectionMultiplexer.Connect(redisHost);
         redisDatabase = connection.GetDatabase();
     }
 }

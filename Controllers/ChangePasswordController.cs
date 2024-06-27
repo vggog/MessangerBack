@@ -1,4 +1,5 @@
-﻿using MessangerBack.Schemas;
+﻿using MessangerBack.Exceptions;
+using MessangerBack.Schemas;
 using MessangerBack.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,15 +13,20 @@ public class ChangePasswordController : ControllerBase
     IChangePasswordService _service;
 
     public ChangePasswordController(IChangePasswordService service) 
-    {
-        _service = service;
-    }
+        => _service = service;
 
     [HttpPost]
     [Route("SendEmailCode")]
     public async Task<IActionResult> SendEmailCode([FromBody] SendEmailCodeSchema userData)
     {
-        await _service.SendEmailCode(userData);
+        try
+        {
+            await _service.SendEmailCode(userData);
+        }
+        catch(NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
         return Ok();
     }
 
@@ -28,19 +34,29 @@ public class ChangePasswordController : ControllerBase
     [Route("CompareEmailCodes")]
     public async Task<IActionResult> CompareEmailCodes([FromBody] CompareEmailCodeSchema userData)
     {
-        bool result = await _service.CompareEmailCodes(userData);
-        if (!result)
+        if (await _service.CompareEmailCodes(userData))
         {
-            return BadRequest();
+            return Ok();
         }
-        return Ok();
+        return BadRequest();
     }
 
     [HttpPost]
     [Route("ChangePassword")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordSchema userData)
     {
-        await _service.ChangePassword(userData);
+        try
+        {
+            await _service.ChangePassword(userData);
+        }
+        catch(NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+        catch(SamePasswordsException ex)
+        {
+            return BadRequest(ex.Message);
+        }
         return Ok();
     }
     

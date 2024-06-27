@@ -2,8 +2,8 @@
 
 namespace MessangerBack.Repositories;
 
-public interface IChangePasswordRepository
+public interface IUsersRepository
 {
     public Task<UserModel?> GetUserByEmail(string email); 
-    public Task ChangePassword(UserModel user, string newPassword);
+    public Task ChangePassword(UserModel user);
 }

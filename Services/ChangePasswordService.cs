@@ -6,19 +6,20 @@ using MessangerBack.Options;
 using MessangerBack.Repositories;
 using MessangerBack.Schemas;
 using MessangerBack.Utils;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Options;
 
 namespace MessangerBack.Services;
 
 public class ChangePasswordService : IChangePasswordService
 {
-    private readonly IChangePasswordRepository _repository;
+    private readonly IUsersRepository _repository;
     private readonly EmailOptions _options;
     private readonly IPasswordUtils _passwordUtils;
 
     public ChangePasswordService(
         IOptions<EmailOptions> options,
-        IChangePasswordRepository repository,
+        IUsersRepository repository,
         IPasswordUtils passwordUtils)
     {
         _passwordUtils = passwordUtils;
@@ -35,21 +36,14 @@ public class ChangePasswordService : IChangePasswordService
         {
             smtpClient.Credentials = new NetworkCredential(_options.UserName, _options.Password);
             smtpClient.EnableSsl = true;
-            try
+            using (MailMessage mailMessage = new MailMessage())
             {
-                using (MailMessage mailMessage = new MailMessage())
-                {
-                    mailMessage.From = new MailAddress(_options.UserName);
-                    mailMessage.To.Add(user.Email);
-                    mailMessage.Subject = "Verification code";
-                    int emailCode = new Random().Next(1000, 9999);
-                    mailMessage.Body = $"Your verification code: {emailCode}";
-                    smtpClient.Send(mailMessage);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw new NotFoundException(ex.Message);
+                mailMessage.From = new MailAddress(_options.UserName);
+                mailMessage.To.Add(user.Email);
+                mailMessage.Subject = "Verification code";
+                int emailCode = new Random().Next(1000, 9999);
+                mailMessage.Body = $"Your verification code: {emailCode}";
+                smtpClient.Send(mailMessage);
             }
         }
     }
@@ -66,8 +60,10 @@ public class ChangePasswordService : IChangePasswordService
         
         if (_passwordUtils.CheckPassword(changePasswordData.NewPassword, user.PasswordHash))
         {
-            throw new SamePasswords("New password must be different from old password");
+            throw new SamePasswordsException("New password must be different from old password");
         }
-        await _repository.ChangePassword(user, changePasswordData.NewPassword);
+
+        user.PasswordHash = _passwordUtils.GeneratePasswordHash(changePasswordData.NewPassword);
+        await _repository.ChangePassword(user);
     }
 }
