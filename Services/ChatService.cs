@@ -89,4 +89,35 @@ public class ChatService : IChatService
 
         return responce;
     }
+
+    public async Task<ChatInfoResponce> GetChatInfo(Guid chatId)
+    {
+        ChatModel chat = await _repository.GetChatById(chatId);
+
+        return new ChatInfoResponce()
+        {
+            Id = chat.Id,
+            ChatName = chat.ChatName,
+            AdminId = chat.AdminId,
+            Admin = new()
+            {
+                Id = chat.Admin.Id,
+                UserName = chat.Admin.UserName,
+            },
+            Users = chat.Users,
+            LastMessageId = chat.LastMessageId,
+            LastMessage = new()
+            {
+                Id = chat.LastMessage.Id,
+                SenderId = chat.LastMessage.SenderId,
+                Sender = new ()
+                {
+                    Id = chat.LastMessage.Sender.Id,
+                    UserName = chat.LastMessage.Sender.UserName,
+                },
+                Text = chat.LastMessage.Text,
+                MessageSentTime = chat.LastMessage.MessageSentTime
+            }
+        };
+    }
 }

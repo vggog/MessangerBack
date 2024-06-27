@@ -70,4 +70,16 @@ public class ChatsController : ControllerBase
 
         return Ok(chats);
     }
+
+    [HttpGet]
+    [Route("Info")]
+    async public Task<IActionResult> GetChatInfo(Guid chatId)
+    {
+        var rawUserId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = Guid.Parse(rawUserId);
+
+        var chat = await _service.GetChatInfo(chatId);
+
+        return Ok(chat);
+    }
 }

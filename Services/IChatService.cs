@@ -9,4 +9,6 @@ public interface IChatService
     public Task AddToChat(Guid userId, Guid chatId);
 
     public Task<List<AllChatsResponce>> GetAllUserChats(Guid userId);
+
+    public Task<ChatInfoResponce> GetChatInfo(Guid chatId);
 }
