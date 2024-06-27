@@ -6,7 +6,7 @@ using MessangerBack.Repositories;
 using Microsoft.Extensions.Configuration;
 using MessangerBack.Utils;
 using MessangerBack.Options;
-using MessangerBack.Extensions;
+using MessangerBack.Extentions;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +17,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtOptions"));
+builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("EmailOptions"));
 
 builder.Services.AddDbContext<DataBaseContext>(
     options => 
@@ -25,10 +26,20 @@ builder.Services.AddDbContext<DataBaseContext>(
             )
         );
 
+// Add services to the container.
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = "localhost"; // Update this with your Redis server address
+    options.InstanceName = "SampleInstance";
+});
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPasswordUtils, PasswordUtils>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
+
+builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+builder.Services.AddScoped<IChangePasswordService, ChangePasswordService>();
 
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IChatRepository, ChatRepository>();

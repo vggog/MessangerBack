@@ -6,7 +6,7 @@ using System.Text;
 using MessangerBack.Options;
 
 
-namespace MessangerBack.Extensions;
+namespace MessangerBack.Extentions;
 
 public static class ApiExtention
 {
