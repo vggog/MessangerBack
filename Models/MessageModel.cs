@@ -6,11 +6,11 @@ public class MessageModel
 
     public Guid ChatId { get; set; }
     
-    public ChatModel Chat{ get; set; }
+    public virtual ChatModel Chat{ get; set; }
 
     public Guid SenderId { get; set; }
 
-    public UserModel Sender{ get; set; }
+    public virtual UserModel Sender{ get; set; }
     
     public string Text { get; set; }
     

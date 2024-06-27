@@ -36,4 +36,50 @@ public class ChatsController : ControllerBase
 
         return Created();
     }
+
+    [HttpGet]
+    [Route("Add")]
+    async public Task<IActionResult> AddToChat(Guid chatId)
+    {
+        var userId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
+        var token = Guid.Parse(userId);
+
+        try
+        {
+            await _service.AddToChat(token, chatId);
+        } 
+        catch(WrongUserInputException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch(NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+
+        return Ok();
+    }
+
+    [HttpGet]
+    async public Task<IActionResult> GetAllChats()
+    {
+        var rawUserId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = Guid.Parse(rawUserId);
+
+        var chats = await _service.GetAllUserChats(userId);
+
+        return Ok(chats);
+    }
+
+    [HttpGet]
+    [Route("Info")]
+    async public Task<IActionResult> GetChatInfo(Guid chatId)
+    {
+        var rawUserId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = Guid.Parse(rawUserId);
+
+        var chat = await _service.GetChatInfo(chatId);
+
+        return Ok(chat);
+    }
 }

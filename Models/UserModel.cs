@@ -10,5 +10,5 @@ public class UserModel
 
     public string Email { get; set; }
 
-    public List<ChatModel> ChatWhereIsTheAdmin { get; set; } = new List<ChatModel>();
+    public virtual List<ChatModel> ChatWhereIsTheAdmin { get; set; } = new List<ChatModel>();
 }

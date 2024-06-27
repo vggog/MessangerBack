@@ -30,4 +30,9 @@ public class ChatRepository : IChatRepository
         _context.Chats.Update(chat);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<List<ChatModel>> GetAllUserChats(Guid userId)
+    {
+        return await _context.Chats.Where(c => c.Users.Contains(userId)).ToListAsync();
+    }
 }
