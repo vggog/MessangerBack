@@ -19,4 +19,9 @@ public class MessageRepository : IMessageRepository
         await _context.Messages.AddAsync(message);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<List<MessageModel>> GetChatMessages(Guid chatId)
+    {
+        return await _context.Messages.Where(m => m.ChatId == chatId).ToListAsync();
+    }
 }
