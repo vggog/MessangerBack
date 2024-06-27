@@ -9,8 +9,14 @@
     "DefaultConnection": "Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=postgres"
   },
   "JwtOptions": {
-    "SecretKey": "",
-    "ExpiresHours": ""
+    "SecretKey": "secretkey",
+    "ExpiresHours": "1"
+  },
+  "EmailOptions": {
+    "Host": "smtp.gmail.com",
+    "Port": "587",
+    "Username": "username@gmail.com",
+    "Password": "password"
   },
   "AllowedHosts": "*"
 }
