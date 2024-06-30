@@ -37,9 +37,7 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.InstanceName = "SampleInstance";
 });
 
-builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IPasswordUtils, PasswordUtils>();
-builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();

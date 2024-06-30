@@ -5,11 +5,7 @@ using System.Net.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
-using MessangerBack.Models;
-using MessangerBack.Repositories;
 using MessangerBack.Schemas;
-using MessangerBack.Services;
-using MessangerBack.Exceptions;
 using MessangerBack.Responces;
 using MessangerBack.Utils;
 
@@ -20,13 +16,11 @@ namespace MessangerBack.Controllers;
 [ApiController]
 public class AuthController : ControllerBase
 {
-    IAuthService _service;
     UserManager<IdentityUser> _userManager;
     IJwtProvider _jwtProvider;
 
-    public AuthController(IAuthService service, UserManager<IdentityUser> manager, IJwtProvider provider) 
+    public AuthController(UserManager<IdentityUser> manager, IJwtProvider provider) 
     {
-        _service = service;
         _userManager = manager;
         _jwtProvider = provider;
     }
