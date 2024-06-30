@@ -1,11 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using MessangerBack.Models;
 using MessangerBack.Configurations;
 
 
 namespace MessangerBack.DataBase;
 
-public class DataBaseContext : DbContext
+public class DataBaseContext : IdentityDbContext<IdentityUser>
 {
     public DbSet<UserModel> Users { get; set; }
     public DbSet<ChatModel> Chats { get; set; }

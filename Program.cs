@@ -1,4 +1,5 @@
 using System.Configuration;
+using Microsoft.AspNetCore.Identity;
 using MessangerBack.DataBase;
 using Microsoft.EntityFrameworkCore;
 using MessangerBack.Services;
@@ -25,6 +26,9 @@ builder.Services.AddDbContext<DataBaseContext>(
             builder.Configuration.GetConnectionString("DefaultConnection")
             )
         );
+
+builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<DataBaseContext>();
 
 // Add services to the container.
 builder.Services.AddStackExchangeRedisCache(options =>
@@ -56,6 +60,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+// app.MapIdentityApi<IdentityUser>();
 
 app.MapControllers();
 
