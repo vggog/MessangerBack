@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 
 namespace MessangerBack.Models;
@@ -9,11 +10,11 @@ public class ChatModel
 
     public Guid AdminId { get; set; }
 
-    public virtual UserModel Admin{ get; set; }
+    public virtual IdentityUser<Guid> Admin{ get; set; }
 
     public Guid[] Users { get; set; }
     
-    public virtual List<UserModel> ModelsOfUsers { get; set; }
+    public virtual List<IdentityUser<Guid>> ModelsOfUsers { get; set; }
     
     public string ChatName { get; set; }
 

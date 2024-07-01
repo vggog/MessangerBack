@@ -16,12 +16,13 @@ public class UsersRepository : IUsersRepository
 
     public async Task<UserModel?> GetUserByEmail(string email)
     {
-        return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        //return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        return new();
     }
 
     public async Task ChangePassword(UserModel user)
     {
-        _context.Users.Update(user);
+        // _context.Users.Update(user);
         await _context.SaveChangesAsync();
     }
 }

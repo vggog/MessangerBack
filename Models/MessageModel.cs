@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Identity;
+
+
 namespace MessangerBack.Models;
 
 public class MessageModel
@@ -10,7 +13,7 @@ public class MessageModel
 
     public Guid SenderId { get; set; }
 
-    public virtual UserModel Sender{ get; set; }
+    public virtual IdentityUser<Guid> Sender{ get; set; }
     
     public string Text { get; set; }
     

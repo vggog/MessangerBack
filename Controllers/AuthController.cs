@@ -16,10 +16,10 @@ namespace MessangerBack.Controllers;
 [ApiController]
 public class AuthController : ControllerBase
 {
-    UserManager<IdentityUser> _userManager;
+    UserManager<IdentityUser<Guid>> _userManager;
     IJwtProvider _jwtProvider;
 
-    public AuthController(UserManager<IdentityUser> manager, IJwtProvider provider) 
+    public AuthController(UserManager<IdentityUser<Guid>> manager, IJwtProvider provider) 
     {
         _userManager = manager;
         _jwtProvider = provider;
@@ -34,7 +34,7 @@ public class AuthController : ControllerBase
             return BadRequest("Password and RepeatPassword must be the same.");
         }
 
-        IdentityUser user = new() 
+        IdentityUser<Guid> user = new() 
         { 
             UserName = userData.UserName, 
             Email = userData.Email 
@@ -51,7 +51,7 @@ public class AuthController : ControllerBase
     [ProducesResponseType(typeof(LoginUserResponce), (int)HttpStatusCode.OK)]
     async public Task<IActionResult> Login([FromBody] LoginUserSchema userData)
     {
-        IdentityUser user = await _userManager.FindByNameAsync(userData.UserName);
+        IdentityUser<Guid> user = await _userManager.FindByNameAsync(userData.UserName);
         
         if (user == null) return NotFound("Пользователь с таким username не найден");
 
@@ -62,7 +62,7 @@ public class AuthController : ControllerBase
 
         LoginUserResponce responce = new() 
         { 
-            AccessToken = _jwtProvider.GenerateTokenByUserId(user.Id)
+            AccessToken = _jwtProvider.GenerateTokenByUserId(user.Id.ToString())
         };
 
         return Ok(responce);

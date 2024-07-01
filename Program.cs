@@ -27,7 +27,7 @@ builder.Services.AddDbContext<DataBaseContext>(
             )
         );
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+builder.Services.AddIdentity<IdentityUser<Guid>, IdentityRole<Guid>>()
                 .AddEntityFrameworkStores<DataBaseContext>();
 
 // Add services to the container.
@@ -58,8 +58,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-// app.MapIdentityApi<IdentityUser>();
 
 app.MapControllers();
 

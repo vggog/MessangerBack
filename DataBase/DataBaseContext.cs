@@ -7,16 +7,13 @@ using MessangerBack.Configurations;
 
 namespace MessangerBack.DataBase;
 
-public class DataBaseContext : IdentityDbContext<IdentityUser>
-{
-    public DbSet<UserModel> Users { get; set; }
+public class DataBaseContext : IdentityDbContext<IdentityUser<Guid>, IdentityRole<Guid>, Guid>
+{    
     public DbSet<ChatModel> Chats { get; set; }
     public DbSet<MessageModel> Messages { get; set; }
 
     public DataBaseContext (DbContextOptions<DataBaseContext> options) : base(options) 
-    { 
-        Database.EnsureCreated();
-    }
+    { }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -30,9 +27,4 @@ public class DataBaseContext : IdentityDbContext<IdentityUser>
 
         base.OnModelCreating(modelBuilder);
     }
-
-    // protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    // {
-    //     optionsBuilder.UseNpgsql("Host=localhost;Port=5433;Database=usersdb;Username=postgres;Password=здесь_указывается_пароль_от_postgres");
-    // }
 }
