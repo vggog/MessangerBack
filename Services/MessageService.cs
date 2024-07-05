@@ -1,7 +1,7 @@
 using MessangerBack.Repositories;
-using MessangerBack.Models;
 using MessangerBack.Responces;
 using MessangerBack.Exceptions;
+using MessangerBack.Models;
 
 
 namespace MessangerBack.Services;
@@ -10,14 +10,16 @@ public class MessageService : IMessageService
 {
     IMessageRepository _repository;
     IChatRepository _chatRepository;
+    IUsersRepository _userRepository;
 
-    public MessageService(IMessageRepository repository, IChatRepository chatRepository)
+    public MessageService(IMessageRepository repository, IChatRepository chatRepository, IUsersRepository userRepository)
     {
         _repository = repository;
         _chatRepository = chatRepository;
+        _userRepository = userRepository;
     }
 
-    public async Task CreateMessage(Guid senderId, Guid chatId, string text)
+    public async Task<MessageResponce> CreateMessage(Guid senderId, Guid chatId, string text)
     {
         MessageModel message = new()
         {
@@ -34,6 +36,20 @@ public class MessageService : IMessageService
         chat.LastMessageId = message.Id;
 
         await _chatRepository.UpdateChat(chat);
+        var user = await _userRepository.GetUserById(senderId);
+
+        return new()
+        {
+            Id = message.Id,
+            SenderId = message.SenderId,
+            Sender = new()
+            {
+                Id = user.Id,
+                UserName = user.UserName
+            },
+            Text = message.Text,
+            MessageSentTime = message.MessageSentTime
+        };
     }
 
     public async Task<List<MessageResponce>> GetChatMessages(Guid chatId, Guid userId)

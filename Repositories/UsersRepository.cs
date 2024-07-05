@@ -4,6 +4,7 @@ using MessangerBack.Models;
 using MessangerBack.Schemas;
 using MessangerBack.Utils;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace MessangerBack.Repositories;
 
@@ -24,5 +25,10 @@ public class UsersRepository : IUsersRepository
     {
         // _context.Users.Update(user);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<IdentityUser<System.Guid>> GetUserById(Guid userId)
+    {
+        return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
     }
 }
