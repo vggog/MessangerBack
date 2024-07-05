@@ -14,7 +14,6 @@ public static class ApiExtention
     {
         var jwtOptions = configuration.GetSection("JwtOptions:SecretKey").Value;
 
-        // services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         services.AddAuthentication(options => {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -29,8 +28,24 @@ public static class ApiExtention
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(jwtOptions))
                 };
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) &&
+                            (path.StartsWithSegments("/api/ChatMessages")))
+                        {
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
+        services.AddSignalR();
         services.AddAuthorization();
     }
 } 

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using MessangerBack.Utils;
 using MessangerBack.Options;
 using MessangerBack.Extentions;
+using MessangerBack.Hubs;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtOptions"));
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("EmailOptions"));
@@ -51,6 +53,23 @@ builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 builder.Services.AddApiAuthentication(builder.Configuration);
 
+builder.Services.AddCors( options => 
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.WithOrigins("http://localhost:3000", "http://192.168.0.109:3000")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
+builder.Services.AddStackExchangeRedisCache(options => {
+    var connection = builder.Configuration.GetConnectionString("Redis");
+
+    options.Configuration = connection;
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -59,9 +78,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors();
+
 app.MapControllers();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHub<ChatHub>("/api/ChatMessages");
 
 app.Run();
