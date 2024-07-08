@@ -31,17 +31,6 @@ public class ChangePasswordController : ControllerBase
     }
 
     [HttpPost]
-    [Route("CompareEmailCodes")]
-    public async Task<IActionResult> CompareEmailCodes([FromBody] CompareEmailCodeSchema userData)
-    {
-        if (await _service.CompareEmailCodes(userData))
-        {
-            return Ok();
-        }
-        return BadRequest();
-    }
-
-    [HttpPost]
     [Route("ChangePassword")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordSchema userData)
     {
@@ -53,11 +42,10 @@ public class ChangePasswordController : ControllerBase
         {
             return NotFound(ex.Message);
         }
-        catch(SamePasswordsException ex)
+        catch(WrongUserInputException ex)
         {
             return BadRequest(ex.Message);
         }
         return Ok();
     }
-    
 }
