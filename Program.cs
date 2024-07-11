@@ -1,14 +1,13 @@
-using System.Configuration;
 using Microsoft.AspNetCore.Identity;
 using MessangerBack.DataBase;
 using Microsoft.EntityFrameworkCore;
 using MessangerBack.Services;
 using MessangerBack.Repositories;
-using Microsoft.Extensions.Configuration;
 using MessangerBack.Utils;
 using MessangerBack.Options;
 using MessangerBack.Extentions;
 using MessangerBack.Hubs;
+using Microsoft.OpenApi.Models;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,7 +15,33 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API", Version = "v1" });
+
+    // Добавьте этот код для добавления заголовка авторизации
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme",
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 builder.Services.AddSignalR();
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtOptions"));
@@ -75,7 +100,13 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI( c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Your API V1");
+        // Добавьте эту строку для отображения поля ввода токена авторизации
+        c.OAuthClientId("swagger");
+        c.OAuthAppName("Swagger");
+    });
 }
 
 app.UseCors();
