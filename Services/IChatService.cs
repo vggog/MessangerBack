@@ -5,7 +5,7 @@ namespace MessangerBack.Services;
 
 public interface IChatService
 {
-    public Task<ChatModel> CreateChat(Guid adminId, string chatName);
+    public Task<ChatInfoResponce> CreateChat(Guid adminId, string chatName);
 
     public Task AddToChat(Guid userId, Guid chatId);
 
