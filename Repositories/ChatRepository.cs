@@ -14,6 +14,11 @@ public class ChatRepository : IChatRepository
         _context = context;
     }
 
+    public async Task<List<ChatModel>> AllChatsFilterByChatName(string chatName)
+    {
+        return await _context.Chats.Where(c => c.ChatName.ToLower().Contains(chatName.ToLower())).ToListAsync();
+    }
+
     public async Task CreateChat(ChatModel chat)
     {
         await _context.Chats.AddAsync(chat);

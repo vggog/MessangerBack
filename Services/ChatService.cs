@@ -17,6 +17,13 @@ public class ChatService : IChatService
         _messageService = messageService;
     }
 
+    public async Task<List<AllChatsResponce>> AllChatsByChatName(string chatName)
+    {
+        var chats = await _repository.AllChatsFilterByChatName(chatName);
+
+        return ChatModelToAllChatsResponce(chats);
+    }
+
     public async Task<ChatInfoResponce> CreateChat(Guid adminId, string chatName)
     {
         Guid[] users = { adminId };
@@ -145,5 +152,36 @@ public class ChatService : IChatService
                 MessageSentTime = chat.LastMessage.MessageSentTime
             }
         };
+    }
+
+    private List<AllChatsResponce> ChatModelToAllChatsResponce(List<ChatModel> chats)
+    {
+        List<AllChatsResponce> responceChats = new();
+        
+        foreach(var chat in chats)
+        {
+            responceChats.Add(
+                new()
+                {
+                    Id = chat.Id,
+                    ChatName = chat.ChatName,
+                    LastMessageId = chat.LastMessageId,
+                    LastMessage = new()
+                    {
+                        Id = chat.LastMessage.Id,
+                        SenderId = chat.LastMessage.SenderId,
+                        Sender = new ()
+                        {
+                            Id = chat.LastMessage.Sender.Id,
+                            UserName = chat.LastMessage.Sender.UserName,
+                        },
+                        Text = chat.LastMessage.Text,
+                        MessageSentTime = chat.LastMessage.MessageSentTime
+                    }
+                }
+            );
+        }
+
+        return responceChats;
     }
 }

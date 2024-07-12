@@ -38,6 +38,15 @@ public class ChatsController : ControllerBase
     }
 
     [HttpGet]
+    [Route("All")]
+    async public Task<IActionResult> AllChats(string chatName = "")
+    {
+        var chats = await _service.AllChatsByChatName(chatName);
+
+        return Ok(chats);
+    }
+
+    [HttpGet]
     [Route("Add")]
     async public Task<IActionResult> AddToChat(Guid chatId)
     {
