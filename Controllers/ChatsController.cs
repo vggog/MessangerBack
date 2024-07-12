@@ -32,9 +32,9 @@ public class ChatsController : ControllerBase
         var userId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
 
         var token = Guid.Parse(userId);
-        ChatModel chat = await _service.CreateChat(token, createChatData.ChatName);
+        var chat = await _service.CreateChat(token, createChatData.ChatName);
 
-        return Created("", chat.Id);
+        return Ok(chat);
     }
 
     [HttpGet]
