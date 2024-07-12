@@ -17,7 +17,7 @@ public class ChatService : IChatService
         _messageService = messageService;
     }
 
-    public async Task CreateChat(Guid adminId, string chatName)
+    public async Task<ChatModel> CreateChat(Guid adminId, string chatName)
     {
         Guid[] users = { adminId };
 
@@ -31,6 +31,8 @@ public class ChatService : IChatService
 
         await _repository.CreateChat(chat);
         await _messageService.CreateMessage(adminId, chat.Id, "Создал чат");
+
+        return chat;
     }
 
     public async Task AddToChat(Guid userId, Guid chatId)

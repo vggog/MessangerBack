@@ -25,7 +25,7 @@ public class ChangePasswordService : IChangePasswordService
         IDistributedCache cache)
     {
         _options = options.Value;
-\        _userManager = userManager;
+        _userManager = userManager;
         _cahce = cache;
     }
 
