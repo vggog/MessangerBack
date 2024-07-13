@@ -154,6 +154,34 @@ public class ChatService : IChatService
         };
     }
 
+    public async Task RemoveFromChat(Guid adminId, Guid userId, Guid chatId)
+    {
+        ChatModel chat;
+        try
+        {
+            chat = await _repository.GetChatById(chatId);
+        } 
+        catch (InvalidOperationException)
+        {
+            throw new NotFoundException("Чат не найден.");
+        }
+
+        if (chat.AdminId != adminId)
+        {
+            throw new Forbidden("Удалять пользователей из чата может только админ.");
+        }
+        else if (adminId == userId)
+        {
+            throw new WrongUserInputException("Админ не может удалить самого себя из чата.");
+        }
+
+        List<Guid> users = new List<Guid>(chat.Users);
+        users.Remove(userId);
+        chat.Users = users.ToArray();
+
+        await _repository.UpdateChat(chat);
+    }
+
     private List<AllChatsResponce> ChatModelToAllChatsResponce(List<ChatModel> chats)
     {
         List<AllChatsResponce> responceChats = new();

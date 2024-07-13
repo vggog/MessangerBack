@@ -91,4 +91,31 @@ public class ChatsController : ControllerBase
 
         return Ok(chat);
     }
+
+    [HttpGet]
+    [Route("RemoveUser")]
+    async public Task<IActionResult> RemoveFromChat(Guid userIdForRemove, Guid chatId)
+    {
+        var rawUserId = User?.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = Guid.Parse(rawUserId);
+
+        try
+        {
+            await _service.RemoveFromChat(userId, userIdForRemove, chatId);
+        } 
+        catch(WrongUserInputException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch(Forbidden ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch(NotFoundException ex)
+        {
+            return NotFound(ex.Message);
+        }
+
+        return Ok();
+    }
 }
