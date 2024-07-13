@@ -62,6 +62,18 @@ public class ChangePasswordService : IChangePasswordService
             throw new NotFoundException("Пользователь с таким email не найден.");
         }
 
+        var validator = new PasswordValidator<IdentityUser<Guid>>();
+        var passwordIsValid = (await validator
+            .ValidateAsync(_userManager, user, changePasswordData.NewPassword))
+            .Succeeded;
+
+        if (!passwordIsValid)
+        {
+            throw new WrongUserInputException(
+                "Длинна пароля должна быть больше 8 символов.\r\n" + 
+                "Пароль должен содержать буквы верхнего и нижнего регистра, спец символы и цифры.");
+        }
+
         var resetCode = await _cahce.GetStringAsync(changePasswordData.Email);
         await _cahce.RemoveAsync(changePasswordData.Email);
         if (resetCode != changePasswordData.ResetCode) 
