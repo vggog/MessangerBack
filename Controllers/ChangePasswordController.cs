@@ -27,6 +27,10 @@ public class ChangePasswordController : ControllerBase
         {
             return NotFound(ex.Message);
         }
+        catch(FormatException ex)
+        {
+            return BadRequest(ex.Message);
+        }
         return Ok();
     }
 
@@ -46,6 +50,7 @@ public class ChangePasswordController : ControllerBase
         {
             return BadRequest(ex.Message);
         }
+
         return Ok();
     }
 }
