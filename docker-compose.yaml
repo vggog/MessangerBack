@@ -16,33 +16,57 @@ services:
   redis:
     image: redis:alpine
     ports:
-      - "6379:6379"
+      - "6380:6379"
     volumes:
       - redis_storage:/data
     networks:
       - MessangerBack-network
     container_name: redis
-
-  # backapi:
-  #   image: ${DOCKER_REGISTRY-}backapi
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   ports:
-  #     - "5000:5000"
-  #   environment:
-  #     - ASPNETCORE_ENVIRONMENT=Development
-  #     - ASPNETCORE_HTTP_PORTS=5000
-  #   networks:
-  #     - MessangerBack-network
-  #   container_name: api
-  #   depends_on:
-  #     - db
-  #     - redis
-
-networks:
-  MessangerBack-network:
+    
+  opensearch-node1:
+    image: opensearchproject/opensearch:latest
+    container_name: opensearch-node1
+    environment:
+      - cluster.name=opensearch-cluster
+      - node.name=opensearch-node1
+      - discovery.seed_hosts=opensearch-node1
+      - cluster.initial_cluster_manager_nodes=opensearch-node1
+      - bootstrap.memory_lock=true  # along with the memlock settings below, disables swapping
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m  # minimum and maximum Java heap size, recommend setting both to 50% of system RAM
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=bars123@superMyPassword   # Sets the demo admin user password when using demo configuration, required for OpenSearch 2.12 and higher
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536  # maximum number of open files for the OpenSearch user, set to at least 65536 on modern systems
+        hard: 65536
+    volumes:
+      - opensearch-data1:/usr/share/opensearch/data
+    ports:
+      - 9200:9200
+      - 9600:9600  # required for Performance Analyzer
+    networks:
+      - opensearch-net
+      
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:latest
+    container_name: opensearch-dashboards
+    ports:
+      - 5601:5601
+    expose:
+      - '5601'
+    environment:
+      OPENSEARCH_HOSTS: '["https://opensearch-node1:9200"]'
+    networks:
+      - opensearch-net
 
 volumes:
   MessangerBackDb:
   redis_storage:
+  opensearch-data1:
+  
+networks:
+  MessangerBack-network:
+  opensearch-net:
+  

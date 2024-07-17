@@ -8,9 +8,18 @@ using MessangerBack.Options;
 using MessangerBack.Extentions;
 using MessangerBack.Hubs;
 using Microsoft.OpenApi.Models;
+using Serilog;
+using Serilog.Events;
+using Serilog.Sinks.OpenSearch;
+using AutoRegisterTemplateVersion = Serilog.Sinks.OpenSearch.AutoRegisterTemplateVersion;
+using CertificateValidations = OpenSearch.Net.CertificateValidations;
+using System.Net;
+using Serilog.Formatting;
+using Newtonsoft.Json;
 
 
 var builder = WebApplication.CreateBuilder(args);
+//builder.Logging.ClearProviders();
 
 builder.Services.AddControllers();
 
@@ -57,10 +66,9 @@ builder.Services.AddDbContext<DataBaseContext>(
 builder.Services.AddIdentity<IdentityUser<Guid>, IdentityRole<Guid>>()
                 .AddEntityFrameworkStores<DataBaseContext>();
 
-// Add services to the container.
 builder.Services.AddStackExchangeRedisCache(options =>
 {
-    options.Configuration = "localhost"; // Update this with your Redis server address
+    options.Configuration = "localhost";
     options.InstanceName = "SampleInstance";
 });
 
@@ -78,7 +86,7 @@ builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 
 builder.Services.AddApiAuthentication(builder.Configuration);
 
-builder.Services.AddCors( options => 
+builder.Services.AddCors(options => 
 {
     options.AddDefaultPolicy(policy =>
     {
@@ -95,7 +103,32 @@ builder.Services.AddStackExchangeRedisCache(options => {
     options.Configuration = connection;
 });
 
+Serilog.Debugging.SelfLog.Enable(msg => Console.WriteLine(msg));
+ServicePointManager.ServerCertificateValidationCallback = (o, certificate, chain, errors) => true;
+ServicePointManager.ServerCertificateValidationCallback = CertificateValidations.AllowAll;
+
+var logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.OpenSearch(new OpenSearchSinkOptions(new Uri("https://localhost:9200"))
+    {
+        AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.OSv1,
+        MinimumLogEventLevel = (LogEventLevel)Enum.Parse(typeof(LogEventLevel), builder.Configuration["Serilog:MinimumLevel:Default"]),
+        TypeName = "_doc",
+        InlineFields = false,
+        ModifyConnectionSettings = x =>
+            x.BasicAuthentication("admin", "bars123@superMyPassword")
+                .ServerCertificateValidationCallback(CertificateValidations.AllowAll)
+                .ServerCertificateValidationCallback((o, certificate, chain, errors) => true),
+        IndexFormat = "my-index-{0:yyyy.MM.dd}",
+    })
+    .CreateLogger();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
+
 var app = builder.Build();
+
+app.Logger.LogInformation("starting up");
 
 if (app.Environment.IsDevelopment())
 {
@@ -103,7 +136,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI( c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Your API V1");
-        // Добавьте эту строку для отображения поля ввода токена авторизации
         c.OAuthClientId("swagger");
         c.OAuthAppName("Swagger");
     });
